@@ -7,6 +7,11 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # Variables configurables
+
+read -p "Puerto en el que hostear Moodle (por defecto: 80): " HOST_PORT
+HOST_PORT=${HOST_PORT:-80}
+read -p "Versión de PHP requerida (por defecto: 8.1): " PHP_VERSION
+PHP_VERSION=${PHP_VERSION:-8.1}
 read -p "Introduce el nombre de la base de datos para WordPress: " DB_NAME
 read -p "Introduce el nombre del usuario de la base de datos: " DB_USER
 read -sp "Introduce la contraseña para el usuario de la base de datos: " DB_PASSWORD
@@ -25,8 +30,19 @@ systemctl enable apache2
 
 # Instalar PHP y extensiones necesarias
 echo "Instalando PHP y extensiones necesarias..."
-apt install php php-mysql php-xml php-curl php-mbstring php-zip php-gd libapache2-mod-php -y
+apt update
+apt install -y software-properties-common
+add-apt-repository ppa:ondrej/php -y
+apt update
+apt install -y php$PHP_VERSION libapache2-mod-php$PHP_VERSION \
+php$PHP_VERSION-cli php$PHP_VERSION-curl php$PHP_VERSION-xml \
+php$PHP_VERSION-mbstring php$PHP_VERSION-zip php$PHP_VERSION-mysql \
+apache2 git unzip
 
+if [ "$HOST_PORT" -ne 80 ]; then
+  echo "=== Configurando Apache para escuchar en el puerto $HOST_PORT ==="
+  echo "Listen $HOST_PORT" >> /etc/apache2/ports.conf
+fi
 # Instalar MySQL
 echo "Instalando MySQL..."
 apt install mysql-server -y
@@ -57,7 +73,7 @@ chmod -R 755 /var/www/html/wordpress
 # Configurar Apache
 echo "Configurando Apache..."
 cat <<EOL > /etc/apache2/sites-available/wordpress.conf
-<VirtualHost *:80>
+<VirtualHost *:$HOST_PORT>
     ServerAdmin admin@$SITE_DOMAIN
     DocumentRoot /var/www/html/wordpress
     ServerName $SITE_DOMAIN
@@ -86,3 +102,6 @@ echo "Datos de la base de datos:"
 echo "  Nombre: $DB_NAME"
 echo "  Usuario: $DB_USER"
 echo "  Contraseña: $DB_PASSWORD"
+echo "Datos de el servidor:"
+echo "  Host: $DB_HOST"
+echo "  Puerto: $DB_PORT"
