@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Comprobación de privilegios de administrador
-if [[ $EUID -ne 0 ]]; then
-    echo "Este script debe ejecutarse como root. Usa 'sudo' para ejecutarlo."
-    exit 1
+# Comprobación de permisos
+if [ "$EUID" -ne 0 ]; then
+  echo "Por favor, ejecuta el script como usuario root."
+  exit 1
 fi
 
 # Variables configurables
