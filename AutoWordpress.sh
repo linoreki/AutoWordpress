@@ -8,7 +8,7 @@ fi
 
 # Variables configurables
 
-read -p "Puerto en el que hostear Moodle (por defecto: 80): " HOST_PORT
+read -p "Puerto en el que hostear wordpress (por defecto: 80): " HOST_PORT
 HOST_PORT=${HOST_PORT:-80}
 read -p "Versión de PHP requerida (por defecto: 8.1): " PHP_VERSION
 PHP_VERSION=${PHP_VERSION:-8.1}
@@ -103,5 +103,5 @@ echo "  Nombre: $DB_NAME"
 echo "  Usuario: $DB_USER"
 echo "  Contraseña: $DB_PASSWORD"
 echo "Datos de el servidor:"
-echo "  Host: $DB_HOST"
-echo "  Puerto: $DB_PORT"
+echo "  Host: $SITE_DOMAIN"
+echo "  Puerto: $HOST_PORT"
